@@ -8,13 +8,6 @@
 #include <algorithm>
 #include <variant>
 
-#ifndef DRONECAN_MAIN_ACTIVITY_ENABLE
-    #define DRONECAN_MAIN_ACTIVITY_ENABLE 1
-#endif
-
-#ifndef CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
-    #define CYPHAL_CAN_MAIN_ACTIVITY_ENABLE 1
-#endif
 
 #ifndef DRONECAN_DNA_ENABLE
     #define DRONECAN_DNA_ENABLE 1
@@ -2193,7 +2186,6 @@ public:
             const std::optional<std::uint8_t>         protocol_version = {},
             const std::optional<NodeID>               local_node_id    = {})
     {
-#if DRONECAN_MAIN_ACTIVITY_ENABLE
         if ((activity_ == nullptr) && can_bitrate &&         //
             protocol_version && (*protocol_version == 0) &&  //
             local_node_id && (*local_node_id > 0) && (*local_node_id <= MaxNodeID))
@@ -2209,9 +2201,6 @@ public:
                                                                           static_cast<std::uint8_t>(*local_node_id));
             }
         }
-#endif // DRONECAN_MAIN_ACTIVITY_ENABLE
-
-#if CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
         if ((activity_ == nullptr) && can_bitrate &&         //
             protocol_version && (*protocol_version == 1) &&  //
             local_node_id && (*local_node_id <= MaxNodeID))
@@ -2227,7 +2216,6 @@ public:
                                                                           static_cast<std::uint8_t>(*local_node_id));
             }
         }
-#endif // CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
 
 #if DRONECAN_DNA_ENABLE
         if ((activity_ == nullptr) && can_bitrate && protocol_version && (*protocol_version == 0))
