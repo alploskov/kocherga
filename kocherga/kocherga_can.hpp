@@ -8,6 +8,30 @@
 #include <algorithm>
 #include <variant>
 
+#ifndef DRONECAN_MAIN_ACTIVITY_ENABLE
+    #define DRONECAN_MAIN_ACTIVITY_ENABLE 1
+#endif
+
+#ifndef CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
+    #define CYPHAL_CAN_MAIN_ACTIVITY_ENABLE 1
+#endif
+
+#ifndef DRONECAN_DNA_ENABLE
+    #define DRONECAN_DNA_ENABLE 1
+#endif
+
+#ifndef CYPHAL_CAN_DNA_ENABLE
+    #define CYPHAL_CAN_DNA_ENABLE 1
+#endif
+
+#ifndef VERSION_DETECTION_ENABLE
+    #define VERSION_DETECTION_ENABLE 1
+#endif
+
+#ifndef BITRATE_DETECTION_ENABLE
+    #define BITRATE_DETECTION_ENABLE 1
+#endif
+
 namespace kocherga::can
 {
 static constexpr std::uint8_t MaxNodeID = 127U;
@@ -2169,6 +2193,7 @@ public:
             const std::optional<std::uint8_t>         protocol_version = {},
             const std::optional<NodeID>               local_node_id    = {})
     {
+#if DRONECAN_MAIN_ACTIVITY_ENABLE
         if ((activity_ == nullptr) && can_bitrate &&         //
             protocol_version && (*protocol_version == 0) &&  //
             local_node_id && (*local_node_id > 0) && (*local_node_id <= MaxNodeID))
@@ -2184,6 +2209,9 @@ public:
                                                                           static_cast<std::uint8_t>(*local_node_id));
             }
         }
+#endif // DRONECAN_MAIN_ACTIVITY_ENABLE
+
+#if CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
         if ((activity_ == nullptr) && can_bitrate &&         //
             protocol_version && (*protocol_version == 1) &&  //
             local_node_id && (*local_node_id <= MaxNodeID))
@@ -2199,6 +2227,9 @@ public:
                                                                           static_cast<std::uint8_t>(*local_node_id));
             }
         }
+#endif // CYPHAL_CAN_MAIN_ACTIVITY_ENABLE
+
+#if DRONECAN_DNA_ENABLE
         if ((activity_ == nullptr) && can_bitrate && protocol_version && (*protocol_version == 0))
         {
             if (const auto bus_mode = driver.configure(*can_bitrate, false, detail::makeAcceptanceFilter<0>({})))
@@ -2210,6 +2241,9 @@ public:
                                                                                               *can_bitrate);
             }
         }
+#endif // DRONECAN_DNA_ENABLE
+
+#if CYPHAL_CAN_DNA_ENABLE
         if ((activity_ == nullptr) && can_bitrate && protocol_version && (*protocol_version == 1))
         {
             if (const auto bus_mode = driver.configure(*can_bitrate, false, detail::makeAcceptanceFilter<1>({})))
@@ -2221,6 +2255,9 @@ public:
                                                                                               *bus_mode);
             }
         }
+#endif // CYPHAL_CAN_DNA_ENABLE
+
+#if VERSION_DETECTION_ENABLE
         if ((activity_ == nullptr) && can_bitrate)
         {
             if (const auto bus_mode =
@@ -2233,12 +2270,16 @@ public:
                                                                                             *can_bitrate);
             }
         }
+#endif // VERSION_DETECTION_ENABLE
+
+#if BITRATE_DETECTION_ENABLE
         if (activity_ == nullptr)
         {
             activity_ = activity_allocator_.construct<detail::BitrateDetectionActivity>(activity_allocator_,
                                                                                         driver,
                                                                                         local_unique_id);
         }
+#endif // BITRATE_DETECTION_ENABLE
         KOCHERGA_ASSERT(activity_ != nullptr);
     }
 
